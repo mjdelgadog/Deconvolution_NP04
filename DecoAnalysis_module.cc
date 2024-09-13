@@ -87,7 +87,7 @@ namespace opdet {
     fInputModuleDeco  =   pset.get< std::string >("InputModuleDeco");
     fInputModuleDigi  =   pset.get< std::string >("InputModuleDigi","daq");
     fInstanceName     =   pset.get< std::string >("InstanceName");
-    fFBkChannel       =   pset.get<std::vector<int> >("FBChannel");
+    fFBkChannel       =   pset.get<std::vector<int> >("FBkChannel");
     fHPKChannel       =   pset.get<std::vector<int> >("HPKChannel");
     
     // Obtain parameters from DetectorClocksService
@@ -130,21 +130,13 @@ namespace opdet {
       if (firstWaveformTime < 0) firstWaveformTime = waveform.TimeStamp();
     }
    
-    // int wvf_num = -1;
-
-    for (size_t i = 0; i < channel_numbers.size(); i++){
+    for (size_t i = 0; i < fFBkChannel.size(); i++){
       raw::OpDetWaveform waveform = OpDetWaveform.at(i);
       recob::OpWaveform decowaveform = OpWaveform.at(i);
 
      //fChNumber= decowaveform.Channel();
-     fChNumber= channel_numbers.at(i);
-     decowaveform.Channel()= channel_numbers;
-           
-
-      /* for (unsigned int hardwareChannel = 0;
-             hardwareChannel < fFBkChannel.at(i); ++fFBkChannel.at(i))*/ // probar esta línea 
-             
-    
+     fChNumber= fFBkChannel.at(i);
+        
       std::cout << "deco_ch" <<  decowaveform.Channel() << std::endl;
       std::cout << "Channelfc" << fChNumber << std::endl;
       
@@ -156,7 +148,7 @@ namespace opdet {
       std::stringstream histName;
       histName << "event_"      << evt.id().event() 
               << "_opchannel_" << fChNumber
-              << "_decowaveform_"  << mapChannelWF[fChNumber];              
+              << "_decowaveform_"  << mapChannelWF[fChNumber];     //improve, this changes the name of the channel         
       // Increase counter for number of waveforms on this optical channel
        mapChannelWF[fChNumber]++;
 
@@ -165,7 +157,7 @@ namespace opdet {
       // Copy values from the waveform into the histogram
       for(size_t tick = 0; tick < decowaveform.NSignal(); tick++){
         // Fill histogram with waveform                        
-        decowaveformHist->SetBinContent(tick, decowaveform.Signal()[tick]);
+        decowaveformHist->SetBinContent(tick+1, decowaveform.Signal()[tick]);
       }    
       // }   
     }                                      
